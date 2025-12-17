@@ -45,7 +45,7 @@ app.use(express.urlencoded());
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!.....");
 });
-
+// Users Post Route
 app.post("/users", async (req: Request, res: Response) => {
   console.log(req.body);
   const { name, email, age, phone, address } = req.body;
@@ -61,6 +61,52 @@ app.post("/users", async (req: Request, res: Response) => {
       message: "Successfully User Created.",
       user: result.rows,
     });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+});
+
+// Users Get Route
+
+app.get("/users", async (req: Request, res: Response) => {
+  try {
+    const result = await pool.query(`SELECT * FROM users`);
+    // console.log(result)
+    res.status(200).json({
+      success: true,
+      message: "users retrieved successfully",
+      users: result,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+});
+
+// Get single users
+
+app.get("/users/:id", async (req: Request, res: Response) => {
+  try {
+    const result = await pool.query(`SELECT * FROM users WHERE id = $1`, [
+      req.params.id,
+    ]);
+    if (result.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        message: "users Not Found",
+      });
+    } else {
+      res.status(200).json({
+        success: true,
+        message: "users retrieved successfully",
+        users: result,
+      });
+    }
   } catch (err: any) {
     res.status(500).json({
       success: false,

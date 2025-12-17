@@ -23,20 +23,18 @@ const initDB = async () => {
         updste_AT TIMESTAMP DEFAULT NOW()
         )
         `);
-  await pool.query(
-    `
-        CREATE TABLE IF NOT EXISTS todos(
-        id SERIAL PRIMARY KEY,
-        user_id INT REFERENCES users(id) ON DELETE CASCADE,
-        title VARCHAR(200) NOT NULL,
-        description TEXT,
-        completed BOOLEAN DEFAULT false,
-        due_date DATE,
-        created_at TIMESTAMP DEFAULT NOW(),
-        updated_at TIMESTAMP DEFAULT NOW()
-        )
-        `
-  );
+  await pool.query(`
+            CREATE TABLE IF NOT EXISTS todos(
+            id SERIAL PRIMARY KEY,
+            user_id INT REFERENCES users(id) ON DELETE CASCADE,
+            title VARCHAR(200) NOT NULL,
+            description TEXT,
+            completed BOOLEAN DEFAULT false,
+            due_date DATE,
+            created_at TIMESTAMP DEFAULT NOW(),
+            updated_at TIMESTAMP DEFAULT NOW()
+            )
+            `);
 };
 initDB();
 app.use(express.json());
@@ -166,6 +164,28 @@ app.delete("/users/:id", async (req: Request, res: Response) => {
         data: result.rows,
       });
     }
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+});
+// Create To for indivisual user
+
+app.post("/todos", async (req: Request, res: Response) => {
+  const { user_id, title } = req.body;
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO todos(user_id, title) VALUES($1, $2) RETURNING *`,
+      [user_id, title]
+    );
+    res.status(201).json({
+      success: true,
+      message: "Todo created",
+      data: result.rows[0],
+    });
   } catch (err: any) {
     res.status(500).json({
       success: false,

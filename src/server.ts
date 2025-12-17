@@ -241,7 +241,24 @@ app.put("/todos/:id", async (req: Request, res: Response) => {
     res.status(500).json({ error: "Failed to fetch todo" });
   }
 });
+// Delete Todos
+app.delete("/todos/:id", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "DELETE FROM todos WHERE id=$1 RETURNING *",
+      [req.params.id]
+    );
 
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Todo not found" });
+    }
+
+    res.json({ success: true, message: "Todo deleted", data: null });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Failed to delete todo" });
+  }
+});
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });

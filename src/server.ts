@@ -2,10 +2,10 @@ import express, { Request, Response } from "express";
 
 import config from "./config";
 import initDB, { pool } from "./config/db";
+import logger from "./middleware/logger";
 
 const app = express();
 const port = config.port;
-
 
 initDB();
 app.use(express.json());
@@ -40,7 +40,7 @@ app.post("/users", async (req: Request, res: Response) => {
 
 // Users Get Route
 
-app.get("/users", async (req: Request, res: Response) => {
+app.get("/users",logger, async (req: Request, res: Response) => {
   try {
     const result = await pool.query(`SELECT * FROM users`);
     // console.log(result)

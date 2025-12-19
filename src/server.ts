@@ -5,6 +5,8 @@ import initDB, { pool } from "./config/db";
 import logger from "./middleware/logger";
 import { userRoute } from "./modules/user/user.route";
 import { todoRoute } from "./modules/todo/todo.route";
+import { authRoutes } from "./modules/auth/auth.route";
+import auth from "./middleware/auth";
 
 const app = express();
 const port = config.port;
@@ -17,35 +19,17 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!.....");
 });
 
-// Users Get Route
-app.use("/users", logger, userRoute);
+// Users  Route
+app.use("/users", logger, auth(), userRoute);
 
-// Users Post Route
-app.use("/users", userRoute);
 
-// Get single users
-
-app.use("/users", userRoute);
-
-// Update user
-app.use("/users", userRoute);
-
-// Delete user
-
-app.use("/users",userRoute);
 // Create To for indivisual user
 
 app.use("/todos", todoRoute);
 
-// Get todo for indivisual user
 
-app.use("/todos", todoRoute);
-
-// Update todo
-
-app.use("/todos/:id",todoRoute);
-// Delete Todos
-app.use("/todos/:id", todoRoute);
+// Auth routes
+app.use("/auth",authRoutes)
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });

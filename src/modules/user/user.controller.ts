@@ -19,15 +19,11 @@ const getUser = async (req: Request, res: Response) => {
 };
 const createUser = async (req: Request, res: Response) => {
   console.log(req.body);
-  const { name, email, age, phone, address } = req.body;
+  // const { name, email,password, age, phone, address } = req.body;
 
   try {
     const result = await userService.createUser(
-      name,
-      email,
-      age,
-      phone,
-      address
+      req.body
     );
     res.status(201).json({
       success: true,

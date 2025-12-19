@@ -3,6 +3,7 @@ import express, { Request, Response } from "express";
 import config from "./config";
 import initDB, { pool } from "./config/db";
 import logger from "./middleware/logger";
+import { userRoute } from "./modules/user/user.route";
 
 const app = express();
 const port = config.port;
@@ -14,134 +15,23 @@ app.use(express.urlencoded());
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!.....");
 });
-// Users Post Route
-app.post("/users", async (req: Request, res: Response) => {
-  console.log(req.body);
-  const { name, email, age, phone, address } = req.body;
-
-  try {
-    const result = await pool.query(
-      `
-        INSERT INTO users(name, email, age, phone, address) VALUES($1,$2,$3,$4,$5) RETURNING *`,
-      [name, email, age, phone, address]
-    );
-    res.status(201).json({
-      success: true,
-      message: "Successfully User Created.",
-      user: result.rows,
-    });
-  } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      message: err.message,
-    });
-  }
-});
 
 // Users Get Route
+app.use("/users", logger, userRoute);
 
-app.get("/users",logger, async (req: Request, res: Response) => {
-  try {
-    const result = await pool.query(`SELECT * FROM users`);
-    // console.log(result)
-    res.status(200).json({
-      success: true,
-      message: "users retrieved successfully",
-      users: result,
-    });
-  } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      message: err.message,
-    });
-  }
-});
+// Users Post Route
+app.use("/users", userRoute);
 
 // Get single users
 
-app.get("/users/:id", async (req: Request, res: Response) => {
-  try {
-    const result = await pool.query(`SELECT * FROM users WHERE id = $1`, [
-      req.params.id,
-    ]);
-    if (result.rows.length === 0) {
-      res.status(404).json({
-        success: false,
-        message: "users Not Found",
-      });
-    } else {
-      res.status(200).json({
-        success: true,
-        message: "users retrieved successfully",
-        users: result.rows,
-      });
-    }
-  } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      message: err.message,
-    });
-  }
-});
+app.use("/users", userRoute);
 
 // Update user
-app.put("/users/:id", async (req: Request, res: Response) => {
-  // console.log(req.params.id);
-  const { name, email } = req.body;
-  try {
-    const result = await pool.query(
-      `UPDATE users SET name=$1, email=$2 WHERE id=$3 RETURNING *`,
-      [name, email, req.params.id]
-    );
-
-    if (result.rows.length === 0) {
-      res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    } else {
-      res.status(200).json({
-        success: true,
-        message: "User updated successfully",
-        data: result.rows[0],
-      });
-    }
-  } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      message: err.message,
-    });
-  }
-});
+app.use("/users", userRoute);
 
 // Delete user
 
-app.delete("/users/:id", async (req: Request, res: Response) => {
-  // console.log(req.params.id);
-  try {
-    const result = await pool.query(`DELETE FROM users WHERE id = $1`, [
-      req.params.id,
-    ]);
-
-    if (result.rowCount === 0) {
-      res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    } else {
-      res.status(200).json({
-        success: true,
-        message: "User deleted successfully",
-        data: result.rows,
-      });
-    }
-  } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      message: err.message,
-    });
-  }
-});
+app.use("/users",userRoute);
 // Create To for indivisual user
 
 app.post("/todos", async (req: Request, res: Response) => {

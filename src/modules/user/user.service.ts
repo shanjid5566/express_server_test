@@ -6,13 +6,13 @@ const getUser = async () => {
   return result;
 };
 const createUser = async (payload: Record<string, unknown>) => {
-  const { name, email, password, age, phone, address } = payload;
+  const { name, roll, email, password, age, phone, address } = payload;
   const hasedPass = await bcrypt.hash(password as string, 10);
 
   const result = await pool.query(
     `
-        INSERT INTO users(name, email,password , age, phone, address) VALUES($1,$2,$3,$4,$5,$6) RETURNING *`,
-    [name, email, hasedPass, age, phone, address]
+        INSERT INTO users(name,roll, email,password , age, phone, address) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
+    [name, roll, email, hasedPass, age, phone, address]
   );
   return result;
 };

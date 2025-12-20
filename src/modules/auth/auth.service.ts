@@ -14,13 +14,13 @@ const loginUser = async (email: string, password: string) => {
     return null;
   }
   const user = result.rows[0];
+  console.log(user)
   const match = await bcrypt.compare(password, user.password);
   if (!match) {
     return false;
   }
-
   const secret = config.user_secret_key;
-  const token = jwt.sign({ name: user.name, email: user.email }, secret, {
+  const token = jwt.sign({ name: user.name, email: user.email, roll: user.roll}, secret, {
     expiresIn: "7d",
   });
 
